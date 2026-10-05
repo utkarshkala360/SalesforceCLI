@@ -1,0 +1,31 @@
+<template>
+    <lightning-card title="Call Anchor Recordings" icon-name="standard:voice_call">
+        <lightning-button slot="actions" label="Refresh" onclick={refresh} disabled={refreshDisabled}></lightning-button>
+        <div class="slds-p-horizontal_medium slds-p-bottom_medium">
+            <template lwc:if={missingTask}>
+                <p>Open Play Recording from a Task record.</p>
+            </template>
+            <template lwc:if={loading}>
+                <div class="spinner-container"><lightning-spinner alternative-text="Loading recordings" size="small"></lightning-spinner></div>
+            </template>
+            <template lwc:if={error}><p role="alert" class="slds-text-color_error">{error}</p></template>
+            <template lwc:if={empty}><p>No accessible .m4a recordings are attached to this Task.</p></template>
+            <template for:each={recordings} for:item="recording">
+                <section key={recording.versionId} class="recording slds-box slds-m-bottom_small" aria-label={recording.title}>
+                    <h2 class="slds-text-heading_small slds-m-bottom_small">{recording.title}</h2>
+                    <audio controls preload="metadata" src={recording.audioUrl} data-id={recording.versionId}
+                        aria-label={recording.title} onplay={handlePlay} onerror={handleAudioError}>
+                        Your browser does not support audio playback.
+                    </audio>
+                    <template lwc:if={recording.playbackError}>
+                        <p role="alert" class="slds-text-color_error slds-m-vertical_small">Playback could not start. Open the file to check access or download it. The recording's codec may not be supported by your browser.</p>
+                    </template>
+                    <lightning-button variant="base" label="Open File" data-id={recording.documentId} onclick={openFile}></lightning-button>
+                </section>
+            </template>
+            <template lwc:if={taskId}>
+                <lightning-button label="Back to Task" onclick={backToTask}></lightning-button>
+            </template>
+        </div>
+    </lightning-card>
+</template>

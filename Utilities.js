@@ -1,0 +1,1 @@
+// sf sobject describe --sobject '{OBJECT_NAME}' --target-org {ORG_AUTH_NAME} --json > {FILE_NAME}.json

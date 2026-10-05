@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>65.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>Call Anchor Task Player</masterLabel>
+    <description>Plays accessible M4A Salesforce Files linked to the Task passed in c__recordId.</description>
+    <targets><target>lightning__UrlAddressable</target></targets>
+</LightningComponentBundle>

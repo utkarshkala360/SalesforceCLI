@@ -1,0 +1,4 @@
+audio { display: block; width: 100%; margin-bottom: 0.75rem; }
+:host { display: block; padding: 1rem; }
+.spinner-container { position: relative; height: 4rem; }
+h2 { overflow-wrap: anywhere; }
