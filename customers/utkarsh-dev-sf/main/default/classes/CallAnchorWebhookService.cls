@@ -1,7 +1,7 @@
 @RestResource(urlMapping='/CallAnchorWebhook/*')
 global with sharing class CallAnchorWebhookService {
   private static final Map<String, Agent> AGENTS = new Map<String, Agent>{
-    'Test-1' => new Agent('005dN00000EECioQAH', 'Sales')
+    'Test-1' => new Agent('005dN00000DL58TQAT', 'Sales')
   };
 
   private static final String DEFAULT_DOMAIN = 'PreSales';
@@ -38,6 +38,13 @@ global with sharing class CallAnchorWebhookService {
     )
   };
 
+  // An open Opportunity with the caller's phone takes priority over the domain's Lead/Contact.
+  private static final String OPPORTUNITY_OBJECT = 'Opportunity';
+  private static final List<String> OPPORTUNITY_PHONE_FIELDS = new List<String>{
+    'Phone__c'
+  };
+  private static final String OPPORTUNITY_FILTER = 'IsClosed = false';
+
   private static final String ACTIVITY_OBJECT = 'Task';
 
   private static final Map<String, String> ACTIVITY_FIELDS = new Map<String, String>{
@@ -59,6 +66,8 @@ global with sharing class CallAnchorWebhookService {
   };
 
   private static final Integer RAW_PAYLOAD_MAX = 32000;
+
+  private static final String SCREEN_FLOW_API_NAME = 'Handle_Webhook_Task';
 
   @HttpPost
   global static void doPost() {
@@ -180,6 +189,8 @@ global with sharing class CallAnchorWebhookService {
         values
       );
 
+      openScreenFlow((Id) valueAt(values, 'calc.ownerId'), activity.Id);
+
       return new Map<String, Object>{
         'success' => true,
         'domain' => domainName,
@@ -197,6 +208,16 @@ global with sharing class CallAnchorWebhookService {
     Map<String, Object> values
   ) {
     String phone = (String) valueAt(values, 'calc.phone');
+
+    List<SObject> opportunities = findByPhone(
+      OPPORTUNITY_OBJECT,
+      OPPORTUNITY_PHONE_FIELDS,
+      phone,
+      OPPORTUNITY_FILTER
+    );
+    if (!opportunities.isEmpty()) {
+      return opportunities[0].Id;
+    }
 
     List<SObject> records = findByPhone(
       domain.primaryObject,
@@ -277,6 +298,22 @@ global with sharing class CallAnchorWebhookService {
     activity.put(linkField(activityObject, recordId), recordId);
     insert as user activity;
     return activity;
+  }
+
+  private static void openScreenFlow(Id agentId, Id recordId) {
+    if (agentId == null) {
+      return;
+    }
+    Database.SaveResult sr = EventBus.publish(
+      new Open_Screen_Flow__e(
+        Target_User_Id__c = agentId,
+        Record_Id__c = recordId,
+        Flow_Api_Name__c = SCREEN_FLOW_API_NAME
+      )
+    );
+    if (!sr.isSuccess()) {
+      System.debug(LoggingLevel.ERROR, sr.getErrors());
+    }
   }
 
   public static String cleanPhone(String phone) {

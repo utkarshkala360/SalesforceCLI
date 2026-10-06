@@ -70,7 +70,7 @@ Each customer has an independent package directory under `customers/`, mapped to
 
 `force-app/` is intentionally empty: it is the default package directory, so anything the CLI/Org Browser retrieves that does not exist locally yet lands there. With VS Code open, Org Guard automatically moves it into `customers/<customer>/` for the current default org (setting `orgGuard.autoSortRetrieves`). Files that already exist in the customer folder are left in `force-app` for you to compare; retrieves from unmapped orgs stay in `force-app`.
 
-**VS Code:** right-click a file/folder â†’ **Org Guard: Deploy / Retrieve This Source**. It blocks the action if the folder does not belong to the current default org, and asks for explicit confirmation when it does. The status bar shows `customer â†’ org`; click it to switch. Install/update with `code --install-extension tools/org-guard/org-guard.vsix --force`. The built-in **SFDX: Deploy/Retrieve This Source** menus are NOT guarded â€” avoid them.
+**VS Code:** right-click a file/folder → **Org Guard: Deploy / Retrieve This Source**. It blocks the action if the folder does not belong to the current default org, and asks for explicit confirmation when it does. The status bar shows `customer → org`; click it to switch. Install/update with `antigravity-ide --install-extension tools/org-guard/org-guard.vsix --force` (Antigravity IDE) or `code --install-extension ...` (VS Code) — install it in whichever editor has the Salesforce extensions. The built-in **SFDX: Deploy/Retrieve This Source** menus are NOT guarded — avoid them.
 
 **CLI:**
 
