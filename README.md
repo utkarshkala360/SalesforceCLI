@@ -1,4 +1,4 @@
-# Salesforce DX Project
+﻿# Salesforce DX Project
 
 Salesforce DX is a development approach that brings source-driven development, team collaboration, and continuous integration to the Salesforce Platform. Instead of working directly in an org through a web browser, you work with metadata as source files in a local DX project, track changes in version control, and deploy through automated processes.
 
@@ -11,7 +11,7 @@ Before you start, make sure you have:
 - **Salesforce CLI** - Download from [developer.salesforce.com/tools/salesforcecli](https://developer.salesforce.com/tools/salesforcecli). See [Install Salesforce CLI](https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_setup_install_cli.htm) for details.
 - **VS Code with Salesforce Extension Pack** - See [Installation Instructions](https://developer.salesforce.com/docs/platform/sfvscode-extensions/guide/install.html) for details. Includes the Agentforce Vibes extension.
 - **A development org** - Sign up for a free Developer Edition org [here](https://developer.salesforce.com/signup).
-- **Dev Hub enabled** (optional, required to create scratch orgs) - You can enable Dev Hub in your development org under Setup > Dev Hub.  See [Provide Developers Access to Salesforce DX Tools](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_setup_dx_tools.htm).
+- **Dev Hub enabled** (optional, required to create scratch orgs) - You can enable Dev Hub in your development org under Setup > Dev Hub. See [Provide Developers Access to Salesforce DX Tools](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_setup_dx_tools.htm).
 
 ## Project Structure
 
@@ -56,3 +56,27 @@ Transform your ideas into custom Lightning apps that extend CRM workflows direct
 - [Salesforce CLI Plugin Development Guide](https://developer.salesforce.com/docs/platform/salesforce-cli-plugin/guide/conceptual-overview.html)
 - [Salesforce VS Code Extensions Documentation](https://developer.salesforce.com/tools/vscode/)
 
+## Per-customer folders (read this first)
+
+Each customer has an independent package directory under `customers/`, mapped to its org in `customers/customers.json`:
+
+| Folder                      | Org alias                 |
+| --------------------------- | ------------------------- |
+| `customers/utkarsh-dev-sf`  | Utkarsh - Dev             |
+| `customers/etha-realty`     | Etha Realty - Production  |
+| `customers/elephantine`     | Elephantine - Sandbox     |
+| `customers/manish-minerals` | Manish Minerals - Sandbox |
+| `customers/rudra-motors`    | Rudra Motors - Sandbox    |
+
+`force-app/` is intentionally empty: it is the default package directory, so anything the CLI/Org Browser retrieves that does not exist locally yet lands there. With VS Code open, Org Guard automatically moves it into `customers/<customer>/` for the current default org (setting `orgGuard.autoSortRetrieves`). Files that already exist in the customer folder are left in `force-app` for you to compare; retrieves from unmapped orgs stay in `force-app`.
+
+**VS Code:** right-click a file/folder â†’ **Org Guard: Deploy / Retrieve This Source**. It blocks the action if the folder does not belong to the current default org, and asks for explicit confirmation when it does. The status bar shows `customer â†’ org`; click it to switch. Install/update with `code --install-extension tools/org-guard/org-guard.vsix --force`. The built-in **SFDX: Deploy/Retrieve This Source** menus are NOT guarded â€” avoid them.
+
+**CLI:**
+
+```powershell
+.\scripts\use-customer.ps1 rudra-motors                      # switch default org
+.\scripts\deploy.ps1   customers\rudra-motors                 # guarded deploy
+.\scripts\retrieve.ps1 customers\rudra-motors                 # guarded retrieve (existing files)
+.\scripts\retrieve-new.ps1 rudra-motors "ApexClass:RM_Foo"    # pull new components into the folder
+```

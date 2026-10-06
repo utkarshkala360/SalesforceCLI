@@ -46,3 +46,6 @@ $RECYCLE.BIN/
 **/__pycache__/
 **/.venv/
 **/venv/
+
+# Org Guard retrieve-new temp folder
+.retrieve-tmp/

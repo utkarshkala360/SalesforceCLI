@@ -1,0 +1,80 @@
+{
+  "name": "org-guard",
+  "displayName": "Org Guard",
+  "description": "Deploy/retrieve customer folders only to the org mapped in customers/customers.json, with an explicit confirmation every time.",
+  "version": "0.0.2",
+  "publisher": "local-360",
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "local"
+  },
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "workspaceContains:sfdx-project.json"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "orgGuard.deploy",
+        "title": "Org Guard: Deploy This Source to Org"
+      },
+      {
+        "command": "orgGuard.retrieve",
+        "title": "Org Guard: Retrieve This Source from Org"
+      },
+      {
+        "command": "orgGuard.switchCustomer",
+        "title": "Org Guard: Switch Customer Org"
+      }
+    ],
+    "configuration": {
+      "title": "Org Guard",
+      "properties": {
+        "orgGuard.autoSortRetrieves": {
+          "type": "boolean",
+          "default": true,
+          "description": "Move components retrieved into force-app (e.g. via Org Browser) into customers/<customer>/ for the current default org."
+        }
+      }
+    },
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "orgGuard.deploy",
+          "group": "0_orgguard@1"
+        },
+        {
+          "command": "orgGuard.retrieve",
+          "group": "0_orgguard@2"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "orgGuard.deploy",
+          "group": "0_orgguard@1"
+        },
+        {
+          "command": "orgGuard.retrieve",
+          "group": "0_orgguard@2"
+        }
+      ],
+      "editor/title/context": [
+        {
+          "command": "orgGuard.deploy",
+          "group": "0_orgguard@1"
+        },
+        {
+          "command": "orgGuard.retrieve",
+          "group": "0_orgguard@2"
+        }
+      ]
+    }
+  }
+}

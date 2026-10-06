@@ -3,6 +3,21 @@
     {
       "path": "force-app",
       "default": true
+    },
+    {
+      "path": "customers/utkarsh-dev-sf"
+    },
+    {
+      "path": "customers/etha-realty"
+    },
+    {
+      "path": "customers/elephantine"
+    },
+    {
+      "path": "customers/manish-minerals"
+    },
+    {
+      "path": "customers/rudra-motors"
     }
   ],
   "name": "DevBox",

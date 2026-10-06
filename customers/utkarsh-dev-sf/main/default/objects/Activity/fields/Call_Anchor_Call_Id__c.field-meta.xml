@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Call_Anchor_Call_Id__c</fullName>
+    <description
+  >For Call Anchor app to prevent duplicate Task creation.</description>
+    <externalId>false</externalId>
+    <label>Call ID</label>
+    <length>100</length>
+    <required>false</required>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>
