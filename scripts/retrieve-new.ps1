@@ -26,8 +26,10 @@ if (-not $Metadata -and -not $Manifest) {
 $what = if ($Manifest) { @("manifest: $Manifest") } else { $Metadata }
 $org = Confirm-CustomerOrg $Customer 'RETRIEVE' $what
 
-$target = Join-Path $ProjectRoot "customers\$Customer"
-$tmpRel = ".retrieve-tmp\" + [guid]::NewGuid()
+# --output-dir writes <dir>/classes/... (no main/default level), so copy into main/default.
+$target = Join-Path $ProjectRoot "customers\$Customer\main\default"
+# Not dot-prefixed: the CLI silently ignores files under hidden folders.
+$tmpRel = "retrieve-tmp\" + [guid]::NewGuid()
 $tmp = Join-Path $ProjectRoot $tmpRel
 
 $sfArgs = @('project', 'retrieve', 'start', '--target-org', $org, '--output-dir', $tmpRel)
@@ -46,4 +48,6 @@ try {
 finally {
     Pop-Location
     if (Test-Path $tmp) { Remove-Item $tmp -Recurse -Force }
+    $tmpRoot = Split-Path -Parent $tmp
+    if ((Test-Path $tmpRoot) -and -not (Get-ChildItem $tmpRoot)) { Remove-Item $tmpRoot }
 }

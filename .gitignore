@@ -48,4 +48,4 @@ $RECYCLE.BIN/
 **/venv/
 
 # Org Guard retrieve-new temp folder
-.retrieve-tmp/
+retrieve-tmp/
