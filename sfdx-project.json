@@ -18,6 +18,9 @@
     },
     {
       "path": "customers/rudra-motors"
+    },
+    {
+      "path": "customers/wunderbar"
     }
   ],
   "name": "DevBox",

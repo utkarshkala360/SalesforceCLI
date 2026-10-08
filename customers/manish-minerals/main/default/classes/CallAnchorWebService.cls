@@ -79,16 +79,16 @@ global with sharing class CallAnchorWebService {
       result.event = eventName;
       if (String.isBlank(eventName))
         throw new RequestException('event is required.');
-      if (eventName != 'recording.ready') {
-        result.code = 'EVENT_IGNORED';
-        result.action = 'ignored';
-        result.message =
-          'Event "' +
-          eventName +
-          '" is not processed; only recording.ready is handled.';
-        respond(200, result);
-        return;
-      }
+      // if (eventName != 'recording.ready') {
+      //   result.code = 'EVENT_IGNORED';
+      //   result.action = 'ignored';
+      //   result.message =
+      //     'Event "' +
+      //     eventName +
+      //     '" is not processed; only recording.ready is handled.';
+      //   respond(200, result);
+      //   return;
+      // }
       if (!(body.get('call') instanceof Map<String, Object>)) {
         throw new RequestException('call must be a JSON object.');
       }

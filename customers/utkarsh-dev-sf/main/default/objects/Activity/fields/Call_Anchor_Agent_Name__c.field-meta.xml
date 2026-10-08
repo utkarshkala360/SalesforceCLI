@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Call_Anchor_Agent_Name__c</fullName>
+    <description>For Call Anchor app to store the name of the agent who handled the call.</description>
     <externalId>false</externalId>
     <label>Agent Name</label>
     <length>100</length>
