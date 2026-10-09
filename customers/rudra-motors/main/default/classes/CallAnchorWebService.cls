@@ -9,7 +9,9 @@ global without sharing class CallAnchorWebService {
     // '7391087601' => '005dz00000BlOGfAAN', // CRE 4
     // '7391077147' => '005dz00000BlNsUAAV', // CRE 5
     // '7391053744' => '005dz00000BlOLVAA3', // CRE 6
-    '9319300765' => '005ao000009nfo1AAA' // Gurpreet Singh
+    '9319300765' => '005ao000009nfo1AAA', // Gurpreet Singh
+    '9391104513' => '005ao000009nfo1AAA', // Gurpreet Singh
+    '8390339979' => '005ao000009nfo1AAA' // Gurpreet Singh
     // '9073589645' => '005ao000009nfo1AAA'  // Gurpreet Singh
   };
 
@@ -418,7 +420,8 @@ global without sharing class CallAnchorWebService {
        */
 
       if (agentUserId != null) {
-        openScreenFlow(agentUserId, taskRecord.Id);
+        // The popup shows the Opportunity matched by the caller's phone
+        openScreenFlow(agentUserId, opportunityRecord.Id, taskRecord.Id);
       }
 
       /*
@@ -515,7 +518,11 @@ global without sharing class CallAnchorWebService {
    * =============================================================
    */
 
-  private static final String SCREEN_FLOW_API_NAME = 'Rudra_Handle_Webhook_Task';
+  private static final String SCREEN_FLOW_API_NAME = 'Call_Anchor_Screen_Flow';
+
+  // Last popup event published, so tests can check what the agent will see
+  @TestVisible
+  private static Open_Screen_Flow__e lastPopupEvent;
 
   /*
    * =============================================================
@@ -533,14 +540,15 @@ global without sharing class CallAnchorWebService {
     return AGENT_USERS_BY_PHONE.get(getLastDigits(digits, 10));
   }
 
-  private static void openScreenFlow(Id agentUserId, Id taskId) {
-    Database.SaveResult sr = EventBus.publish(
-      new Open_Screen_Flow__e(
-        Target_User_Id__c = agentUserId,
-        Record_Id__c = taskId,
-        Flow_Api_Name__c = SCREEN_FLOW_API_NAME
-      )
+  private static void openScreenFlow(Id agentUserId, Id recordId, Id taskId) {
+    lastPopupEvent = new Open_Screen_Flow__e(
+      Target_User_Id__c = agentUserId,
+      Record_Id__c = recordId,
+      Task_Id__c = taskId,
+      Flow_Api_Name__c = SCREEN_FLOW_API_NAME
     );
+
+    Database.SaveResult sr = EventBus.publish(lastPopupEvent);
 
     if (!sr.isSuccess()) {
       System.debug(LoggingLevel.ERROR, sr.getErrors());

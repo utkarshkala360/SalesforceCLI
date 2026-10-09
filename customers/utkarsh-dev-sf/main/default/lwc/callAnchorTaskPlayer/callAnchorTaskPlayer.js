@@ -133,19 +133,22 @@ export default class CallAnchorTaskPlayer extends NavigationMixin(
       }
       audioUrl = URL.createObjectURL(new Blob([bytes], { type: mimeType }));
       this.objectUrls.push(audioUrl);
-    } catch (error) {
+    } catch {
       audioUrl = downloadUrl(versionId);
     }
-    if (!this.recordings.some((recording) => recording.versionId === versionId)) {
+    if (
+      !this.recordings.some((recording) => recording.versionId === versionId)
+    ) {
       if (audioUrl.startsWith("blob:")) URL.revokeObjectURL(audioUrl);
       return;
     }
     this.updateRecording(versionId, { audioUrl, audioLoading: false });
   }
   updateRecording(versionId, changes) {
-    this.recordings = this.recordings.map((recording) =>
-      recording.versionId === versionId ? { ...recording, ...changes } : recording
-    );
+    this.recordings = this.recordings.map((recording) => {
+      if (recording.versionId !== versionId) return recording;
+      return { ...recording, ...changes };
+    });
   }
   revokeObjectUrls() {
     this.objectUrls.forEach((url) => URL.revokeObjectURL(url));

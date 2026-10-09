@@ -21,6 +21,9 @@
     },
     {
       "path": "customers/wunderbar"
+    },
+    {
+      "path": "customers/runwal-sandbox"
     }
   ],
   "name": "DevBox",
