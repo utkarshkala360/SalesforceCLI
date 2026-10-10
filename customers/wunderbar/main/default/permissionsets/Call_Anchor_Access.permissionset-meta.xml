@@ -10,52 +10,102 @@
     </classAccesses>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Activity.Call_Anchor_Agent_Mobile__c</field>
+        <field>Event.Call_Anchor_Agent_Mobile__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Activity.Call_Anchor_Agent_Name__c</field>
+        <field>Event.Call_Anchor_Agent_Name__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Activity.Call_Anchor_Call_Id__c</field>
+        <field>Event.Call_Anchor_Call_Id__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Activity.Call_Anchor_Call_Started_At__c</field>
+        <field>Event.Call_Anchor_Call_Started_At__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Activity.Call_Anchor_Call_Type__c</field>
+        <field>Event.Call_Anchor_Call_Type__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Activity.Call_Anchor_Callback_Scheduled_At__c</field>
+        <field>Event.Call_Anchor_Callback_Scheduled_At__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Activity.Call_Anchor_Disposition_Note__c</field>
+        <field>Event.Call_Anchor_Disposition_Note__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Activity.Call_Anchor_Disposition__c</field>
+        <field>Event.Call_Anchor_Disposition__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Activity.Call_Anchor_Duration_Seconds__c</field>
+        <field>Event.Call_Anchor_Duration_Seconds__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Activity.Call_Anchor_Recording_Url__c</field>
+        <field>Event.Call_Anchor_Recording_Url__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Task.Call_Anchor_Agent_Mobile__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Task.Call_Anchor_Agent_Name__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Task.Call_Anchor_Call_Id__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Task.Call_Anchor_Call_Started_At__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Task.Call_Anchor_Call_Type__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Task.Call_Anchor_Callback_Scheduled_At__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Task.Call_Anchor_Disposition_Note__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Task.Call_Anchor_Disposition__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Task.Call_Anchor_Duration_Seconds__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Task.Call_Anchor_Recording_Url__c</field>
         <readable>true</readable>
     </fieldPermissions>
 </PermissionSet>

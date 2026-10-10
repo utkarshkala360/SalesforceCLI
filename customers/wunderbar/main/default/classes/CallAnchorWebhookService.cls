@@ -19,8 +19,15 @@ global with sharing class CallAnchorWebhookService {
     'LastName' => 'calc.calleeName',
     'Company' => 'calc.calleeName',
     'Father_Name__c' => 'calc.calleeName',
-    'Fathers_Contact_No__c' => 'calc.phone'
+    'Fathers_Contact_No__c' => 'calc.leadPhone',
+    'Location__c' => 'calc.leadLocation',
+    'Lead_Source_Primary_new1__c' => 'calc.leadSource'
   };
+
+  // Lead validation rules require contact numbers in +91XXXXXXXXXX format.
+  private static final String LEAD_PHONE_PREFIX = '+91';
+  private static final String LEAD_LOCATION = 'NA';
+  private static final String LEAD_SOURCE = '360 CallAnchor';
 
   private static final String ACTIVITY_OBJECT = 'Task';
 
@@ -103,6 +110,9 @@ global with sharing class CallAnchorWebhookService {
         'status' => 'Completed',
         'activityDate' => startedAt != null ? startedAt.date() : Date.today(),
         'phone' => phone,
+        'leadPhone' => LEAD_PHONE_PREFIX + phone,
+        'leadLocation' => LEAD_LOCATION,
+        'leadSource' => LEAD_SOURCE,
         'calleeName' => String.isBlank(calleeName) ? phone : calleeName.trim(),
         'rawPayload' => body.toString().left(RAW_PAYLOAD_MAX)
       }

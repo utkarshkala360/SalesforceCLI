@@ -457,9 +457,7 @@ global without sharing class CallAnchorWebService {
 
     String comparisonNumber = getLastDigits(incomingPhone, 10);
 
-    String suffix = getLastDigits(comparisonNumber, 4);
-
-    String searchPattern = '%' + suffix;
+    String searchPattern = '%' + comparisonNumber;
 
     List<Opportunity__c> candidates = [
       SELECT Id, Name, Phone__c

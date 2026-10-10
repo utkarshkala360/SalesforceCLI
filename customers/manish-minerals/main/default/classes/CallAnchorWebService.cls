@@ -6,7 +6,10 @@ global with sharing class CallAnchorWebService {
   private static final String NEW_ENQUIRY_RECORD_TYPE = 'New_Customer';
   private static final String NEW_TEAM_MEMBER = 'New';
   private static final Integer CANDIDATE_LIMIT = 500;
-  // Agent mobile (normalized: country code + number, digits only) -> Enquiry Team_Member__c.
+  private static final String FOLLOW_UP_SUFFIX = '-followup';
+  private static final String OPEN_STATUS = 'Open';
+  // Agent mobile (normalized: country code + number, digits only) -> Team_Member__c
+  // on the Enquiry and the Task.
   // Agents not listed here fall back to NEW_TEAM_MEMBER.
   private static final Map<String, String> TEAM_MEMBER_BY_AGENT_MOBILE = new Map<String, String>{
     '918291936833' => 'Vaishnavi Prabhu',
@@ -50,6 +53,7 @@ global with sharing class CallAnchorWebService {
     public String event; // event name received in the payload
     public String callId; // call.id received in the payload
     public Id taskId; // Task created/updated
+    public Id followUpTaskId; // open follow-up Task created/updated for ScheduledAt__c
     public Id relatedRecordId; // Account or Enquiry__c the Task is related to
     public String relatedObject; // Account | Enquiry__c
     public Boolean createdEnquiry; // true when a new Enquiry__c was created for the caller
@@ -115,6 +119,10 @@ global with sharing class CallAnchorWebService {
       String note = firstNonblank(
         stringValue(dispositionFields.get('note')),
         callData.dispositionNote
+      );
+      String dispositionLabel = firstNonblank(
+        callData.dispositionLabel,
+        outcome
       );
 
       // Bind values, never concatenate payload data into a query.
@@ -246,13 +254,7 @@ global with sharing class CallAnchorWebService {
         false,
         warnings
       );
-      putValue(
-        activity,
-        'disposition__c',
-        firstNonblank(callData.dispositionLabel, outcome),
-        true,
-        warnings
-      );
+      putValue(activity, 'disposition__c', dispositionLabel, true, warnings);
       putValue(activity, 'Outcome__c', outcome, true, warnings);
       putValue(activity, 'Note__c', note, true, warnings);
       putValue(
@@ -262,17 +264,33 @@ global with sharing class CallAnchorWebService {
         true,
         warnings
       );
+      putTeamMember(activity, teamMemberFor(callData.agentNumber), warnings);
       setRelatedType(activity, parentId, warnings);
+      activity.Description = clip(
+        callSummary(callData, direction, customer, outcome, note),
+        Task.Description.getDescribe().getLength()
+      );
 
       if (isNewTask) {
         insert as user activity;
       } else {
         update as user activity;
       }
+      Task followUp = upsertFollowUp(
+        callData,
+        parentId,
+        direction,
+        customer,
+        dispositionLabel,
+        outcome,
+        note,
+        warnings
+      );
       String relatedObject = parentId.getSObjectType().getDescribe().getName();
       result.code = isNewTask ? 'TASK_CREATED' : 'TASK_UPDATED';
       result.action = isNewTask ? 'created' : 'updated';
       result.taskId = activity.Id;
+      result.followUpTaskId = followUp == null ? null : followUp.Id;
       result.relatedRecordId = parentId;
       result.relatedObject = relatedObject;
       result.createdEnquiry = createdEnquiry;
@@ -281,7 +299,12 @@ global with sharing class CallAnchorWebService {
         ' and related to ' +
         (createdEnquiry ? 'a new ' : 'existing ') +
         relatedObject +
-        '.';
+        '.' +
+        (followUp == null
+          ? ''
+          : ' Follow-up Task scheduled for ' +
+            readable(callData.dispositionScheduledAt) +
+            '.');
       respond(isNewTask ? 201 : 200, result);
     } catch (MatchConflictException e) {
       fail(checkpoint, result, 409, 'MATCH_CONFLICT', e.getMessage(), false);
@@ -494,15 +517,25 @@ global with sharing class CallAnchorWebService {
     enquiry.put('RecordTypeId', recordType.getRecordTypeId());
     putValue(enquiry, 'Phone__c', phone, true, warnings);
     putValue(enquiry, 'First_Name__c', calleeName, true, warnings);
-    String teamMember = teamMemberFor(agentNumber);
+    putTeamMember(enquiry, teamMemberFor(agentNumber), warnings);
+    insert as user enquiry;
+    return (Id) enquiry.get('Id');
+  }
+
+  private static void putTeamMember(
+    SObject record,
+    String teamMember,
+    List<String> warnings
+  ) {
     try {
-      putValue(enquiry, 'Team_Member__c', teamMember, true, warnings);
+      putValue(record, 'Team_Member__c', teamMember, true, warnings);
     } catch (ConfigurationException e) {
       // e.g. the agent's name is not a value of a restricted picklist: keep the call, flag it.
       if (teamMember == NEW_TEAM_MEMBER)
         throw e;
       warnings.add(
-        'Team_Member__c could not be set to "' +
+        record.getSObjectType().getDescribe().getName() +
+          '.Team_Member__c could not be set to "' +
           teamMember +
           '" (' +
           e.getMessage() +
@@ -510,10 +543,167 @@ global with sharing class CallAnchorWebService {
           NEW_TEAM_MEMBER +
           '" was used instead.'
       );
-      putValue(enquiry, 'Team_Member__c', NEW_TEAM_MEMBER, true, warnings);
+      putValue(record, 'Team_Member__c', NEW_TEAM_MEMBER, true, warnings);
     }
-    insert as user enquiry;
-    return (Id) enquiry.get('Id');
+  }
+
+  // Creates or updates the open follow-up Task due at ScheduledAt__c. Keyed by
+  // Call_Id__c = <callId>-followup so webhook retries never create duplicates.
+  private static Task upsertFollowUp(
+    CallData callData,
+    Id parentId,
+    String direction,
+    String customer,
+    String dispositionLabel,
+    String outcome,
+    String note,
+    List<String> warnings
+  ) {
+    Datetime scheduledAt = callData.dispositionScheduledAt;
+    if (scheduledAt == null)
+      return null;
+    String followUpCallId = callData.id + FOLLOW_UP_SUFFIX;
+    List<SObject> existing = Database.queryWithBinds(
+      'SELECT Id, IsClosed FROM Task ' +
+      'WHERE Call_Id__c = :followUpCallId LIMIT 2 FOR UPDATE',
+      new Map<String, Object>{ 'followUpCallId' => followUpCallId },
+      AccessLevel.USER_MODE
+    );
+    if (existing.size() > 1) {
+      throw new MatchConflictException(
+        'Multiple follow-up Tasks already have Call_Id__c ' +
+          followUpCallId +
+          '. Resolve duplicates first.'
+      );
+    }
+    Task followUp;
+    if (existing.isEmpty()) {
+      followUp = new Task(
+        WhatId = parentId,
+        OwnerId = UserInfo.getUserId(),
+        Status = openStatus(),
+        TaskSubtype = 'Call'
+      );
+    } else if ((Boolean) existing[0].get('IsClosed')) {
+      // Already worked on: never reopen or reschedule a completed follow-up.
+      warnings.add(
+        'Follow-up Task ' +
+          existing[0].get('Id') +
+          ' is already closed and was left unchanged.'
+      );
+      return null;
+    } else {
+      followUp = new Task(Id = (Id) existing[0].get('Id'));
+    }
+    followUp.Subject = clip(
+      'Follow-up: ' + direction + ' call - ' + customer,
+      Task.Subject.getDescribe().getLength()
+    );
+    followUp.ActivityDate = scheduledAt.date();
+    followUp.IsReminderSet = scheduledAt > Datetime.now();
+    followUp.ReminderDateTime = followUp.IsReminderSet ? scheduledAt : null;
+    followUp.Description = clip(
+      'Follow-up scheduled on call ' +
+        callData.id +
+        ' for ' +
+        readable(scheduledAt) +
+        '.' +
+        (String.isBlank(note) ? '' : '\nNote: ' + note),
+      Task.Description.getDescribe().getLength()
+    );
+    putValue(followUp, 'Call_Id__c', followUpCallId, true, warnings);
+    putValue(followUp, 'ScheduledAt__c', scheduledAt, true, warnings);
+    putValue(followUp, 'disposition__c', dispositionLabel, true, warnings);
+    putValue(followUp, 'Outcome__c', outcome, true, warnings);
+    putValue(followUp, 'Note__c', note, true, warnings);
+    putValue(followUp, 'Agent_Name__c', callData.agentName, true, warnings);
+    putValue(followUp, 'Agent_Mobile__c', callData.agentNumber, true, warnings);
+    putValue(followUp, 'calleeName__c', callData.calleeName, true, warnings);
+    putValue(followUp, 'calleePhone__c', callData.calleePhone, true, warnings);
+    putTeamMember(followUp, teamMemberFor(callData.agentNumber), warnings);
+    if (followUp.Id == null) {
+      setRelatedType(followUp, parentId, warnings);
+      insert as user followUp;
+    } else {
+      update as user followUp;
+    }
+    return followUp;
+  }
+
+  // "Open" if present, otherwise the org's default open status, otherwise the first open one.
+  private static String openStatus() {
+    List<TaskStatus> statuses = [
+      SELECT ApiName, MasterLabel, IsDefault
+      FROM TaskStatus
+      WHERE IsClosed = FALSE
+      ORDER BY SortOrder
+    ];
+    if (statuses.isEmpty()) {
+      throw new ConfigurationException(
+        'Configure at least one open Task status.'
+      );
+    }
+    TaskStatus defaultStatus;
+    for (TaskStatus option : statuses) {
+      if (
+        option.ApiName.equalsIgnoreCase(OPEN_STATUS) ||
+        option.MasterLabel.equalsIgnoreCase(OPEN_STATUS)
+      )
+        return option.ApiName;
+      if (option.IsDefault && defaultStatus == null)
+        defaultStatus = option;
+    }
+    return (defaultStatus == null ? statuses[0] : defaultStatus).ApiName;
+  }
+
+  private static String callSummary(
+    CallData callData,
+    String direction,
+    String customer,
+    String outcome,
+    String note
+  ) {
+    List<String> lines = new List<String>();
+    addLine(lines, 'Call ID', callData.id);
+    addLine(lines, 'Direction', direction);
+    addLine(
+      lines,
+      'Customer',
+      customer == callData.calleePhone
+        ? customer
+        : customer + ' (' + callData.calleePhone + ')'
+    );
+    addLine(
+      lines,
+      'Agent',
+      callData.agentName + ' (' + callData.agentNumber + ')'
+    );
+    addLine(lines, 'Started', readable(callData.startedAt));
+    addLine(lines, 'Duration', duration(callData.durationSeconds));
+    addLine(lines, 'Disposition', callData.dispositionLabel);
+    addLine(lines, 'Outcome', outcome);
+    addLine(lines, 'Note', note);
+    addLine(lines, 'Follow-up', readable(callData.dispositionScheduledAt));
+    addLine(lines, 'Recording', callData.recordingUrl);
+    return String.join(lines, '\n');
+  }
+
+  private static void addLine(List<String> lines, String label, String value) {
+    if (!String.isBlank(value))
+      lines.add(label + ': ' + value);
+  }
+
+  private static String duration(Integer seconds) {
+    if (seconds == null)
+      return null;
+    Integer minutes = seconds / 60;
+    Integer remainder = Math.mod(seconds, 60);
+    return (minutes > 0 ? minutes + 'm ' : '') + remainder + 's';
+  }
+
+  // Shown in the integration user's time zone, e.g. "09 Oct 2026, 03:30 PM IST".
+  private static String readable(Datetime value) {
+    return value == null ? null : value.format('dd MMM yyyy, hh:mm a z');
   }
 
   @TestVisible
@@ -737,6 +927,7 @@ global with sharing class CallAnchorWebService {
     result.message = message;
     result.retryable = retryable;
     result.taskId = null;
+    result.followUpTaskId = null;
     result.relatedRecordId = null;
     result.relatedObject = null;
     result.createdEnquiry = false;
