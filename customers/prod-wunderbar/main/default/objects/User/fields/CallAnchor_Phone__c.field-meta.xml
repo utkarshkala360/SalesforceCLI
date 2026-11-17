@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CallAnchor_Phone__c</fullName>
+    <description
+  >Call Anchor: the agent mobile the app sends as call.agentNumber (10 digits; +91, spaces and dashes are ignored).</description>
+    <externalId>false</externalId>
+    <label>Call Anchor Phone</label>
+    <length>20</length>
+    <required>false</required>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

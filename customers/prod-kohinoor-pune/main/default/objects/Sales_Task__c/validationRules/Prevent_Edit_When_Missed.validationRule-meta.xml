@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Prevent_Edit_When_Missed</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(
+  ISPICKVAL(PRIORVALUE(Task_Status__c), &quot;Missed&quot;),
+  (
+    ISCHANGED(Task_Status__c) ||
+    ISCHANGED(Task_Subject__c) ||
+    ISCHANGED(Task_Time__c) ||
+    ISCHANGED(Next_Action_time__c) ||
+    ISCHANGED(Task_Date__c) ||
+    ISCHANGED(Next_Action_Date__c) ||
+    ISCHANGED(Proposed_Time_of_Visit_Revisit__c) ||
+    ISCHANGED(Priority__c) ||
+    ISCHANGED(Call_Meeting_Status__c) ||
+    ISCHANGED(Activity_Completion_Date__c) ||
+    ISCHANGED(Comments__c) ||
+    ISCHANGED(Proposed_Date_of_Visit_Revisit__c)
+  )
+)</errorConditionFormula>
+    <errorMessage>You cannot modify fields</errorMessage>
+</ValidationRule>

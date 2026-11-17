@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <name>Foundree_Admission_Taken_Opp</name>
+        <label>Foundree Admission Taken Opp</label>
+        <locationX>720</locationX>
+        <locationY>410</locationY>
+        <actionName>Opportunity.Foundree_Admission_Taken_Opp</actionName>
+        <actionType>emailAlert</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>SObjectRowId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputParameters>
+        <nameSegment>Opportunity.Foundree_Admission_Taken_Opp</nameSegment>
+    </actionCalls>
+    <actionCalls>
+        <name>Foundree_Lost_Opp11</name>
+        <label>Foundree Lost Opp11</label>
+        <locationX>501</locationX>
+        <locationY>352</locationY>
+        <actionName>Opportunity.Foundree_Lost_Opp</actionName>
+        <actionType>emailAlert</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>SObjectRowId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputParameters>
+        <nameSegment>Opportunity.Foundree_Lost_Opp</nameSegment>
+    </actionCalls>
+    <actionCalls>
+        <name>Foundree_School_Visit_Done_Opp</name>
+        <label>Foundree School Visit Done Opp</label>
+        <locationX>964</locationX>
+        <locationY>341</locationY>
+        <actionName>Opportunity.Foundree_School_Visit_Done_Opp</actionName>
+        <actionType>emailAlert</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>SObjectRowId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputParameters>
+        <nameSegment>Opportunity.Foundree_School_Visit_Done_Opp</nameSegment>
+    </actionCalls>
+    <apiVersion>60.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <decisions>
+        <description
+    >Ends the flow when an update changed only the next follow-up date/time (e.g. set by the Call Anchor webhook), so no message is re-sent. Continues on create, or when the stage or any other field this flow uses to pick its message changed.</description>
+        <name>Skip_Follow_Up_Only_Update</name>
+        <label>Skip Follow-Up Only Update</label>
+        <locationX>100</locationX>
+        <locationY>116</locationY>
+        <defaultConnectorLabel
+    >Only follow-up date/time changed</defaultConnectorLabel>
+        <rules>
+            <name>Continue_Flow</name>
+            <conditionLogic>(1 AND 2) OR 3 OR 4 OR 5 OR 6</conditionLogic>
+            <conditions>
+                <leftValueReference
+        >$Record.Next_followup_date__c</leftValueReference>
+                <operator>IsChanged</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference
+        >$Record.Next_Followup_Time__c</leftValueReference>
+                <operator>IsChanged</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.StageName</leftValueReference>
+                <operator>IsChanged</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.Brand__c</leftValueReference>
+                <operator>IsChanged</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference
+        >$Record.Mother_s_Email__c</leftValueReference>
+                <operator>IsChanged</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.Father_Email__c</leftValueReference>
+                <operator>IsChanged</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Faundree_Flow</targetReference>
+            </connector>
+            <label>Continue Flow</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>Faundree_Flow</name>
+        <label>Faundree Flow</label>
+        <locationX>575</locationX>
+        <locationY>96</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Foundree_School_Visit_Done</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.StageName</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>School Visit Done</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference
+        >Foundree_School_Visit_Done_Opp</targetReference>
+            </connector>
+            <label>Foundree School Visit Done</label>
+        </rules>
+        <rules>
+            <name>Foundree_Admission_Taken_Opp1</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.StageName</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Admission Done</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Foundree_Admission_Taken_Opp</targetReference>
+            </connector>
+            <label>Foundree Admission Taken Opp1</label>
+        </rules>
+        <rules>
+            <name>Lost_Not_Interested</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.StageName</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Lost Before School Visit</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Foundree_Lost_Opp11</targetReference>
+            </connector>
+            <label>Lost Not Interested</label>
+        </rules>
+    </decisions>
+    <environments>Default</environments>
+    <interviewLabel>Foundree Flow {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Foundree Flow opp</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>FREE_FORM_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>100</locationX>
+        <locationY>36</locationY>
+        <connector>
+            <targetReference>Skip_Follow_Up_Only_Update</targetReference>
+        </connector>
+        <filterLogic>1 AND (2 OR 3)</filterLogic>
+        <filters>
+            <field>Brand__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Foundree</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>Mother_s_Email__c</field>
+            <operator>IsNull</operator>
+            <value>
+                <booleanValue>false</booleanValue>
+            </value>
+        </filters>
+        <filters>
+            <field>Father_Email__c</field>
+            <operator>IsNull</operator>
+            <value>
+                <booleanValue>false</booleanValue>
+            </value>
+        </filters>
+        <object>Opportunity</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

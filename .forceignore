@@ -15,3 +15,6 @@ node_modules/
 
 # Placeholder files that keep empty customer folders in git
 **/.gitkeep
+
+# Claude Code instruction files (not metadata)
+**/CLAUDE.md

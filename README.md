@@ -60,23 +60,43 @@ Transform your ideas into custom Lightning apps that extend CRM workflows direct
 
 Each customer has an independent package directory under `customers/`, mapped to its org in `customers/customers.json`:
 
-| Folder                      | Org alias                 |
-| --------------------------- | ------------------------- |
-| `customers/utkarsh-dev-sf`  | Utkarsh - Dev             |
-| `customers/etha-realty`     | Etha Realty - Production  |
-| `customers/elephantine`     | Elephantine - Sandbox     |
-| `customers/manish-minerals` | Manish Minerals - Sandbox |
-| `customers/rudra-motors`    | Rudra Motors - Sandbox    |
+Folders are named `{env}-{alias}`, where env is `dev`, `sandbox` or `prod`.
+
+| Folder                              | Org alias                 |
+| ----------------------------------- | ------------------------- |
+| `customers/dev-utkarsh`             | Utkarsh - Dev             |
+| `customers/dev-giftedson`           | Giftedson - Dev           |
+| `customers/sandbox-elegant-altima`  | Elegant Altima - Sandbox  |
+| `customers/sandbox-manish-minerals` | Manish Minerals - Sandbox |
+| `customers/sandbox-rudra-motors`    | Rudra Motors - Sandbox    |
+| `customers/sandbox-runwal`          | Runwal - Sandbox          |
+| `customers/sandbox-wunderbar`       | Wunderbar - Sandbox       |
+| `customers/prod-elephantine`        | Elephantine - Production  |
+| `customers/prod-etha-realty`        | Etha Realty - Production  |
+| `customers/prod-rudra-motors`       | Rudra Motors - Production |
+
+**New orgs register themselves.** With VS Code open, Org Guard watches `~/.sfdx`; when an org is authorized (`sf org login web -a "Acme - Sandbox"` or **SFDX: Authorize an Org**), it creates `customers/sandbox-acme/main/default`, maps it in `customers/customers.json` and adds it to `sfdx-project.json`. If the folder name is taken it uses `sandbox-acme_1`, `sandbox-acme_2`, …. Re-authorizing an org that is already mapped creates nothing. Turn off with the `orgGuard.autoRegisterNewOrgs` setting.
 
 `force-app/` is intentionally empty: it is the default package directory, so anything the CLI/Org Browser retrieves that does not exist locally yet lands there. With VS Code open, Org Guard automatically moves it into `customers/<customer>/` for the current default org (setting `orgGuard.autoSortRetrieves`). Files that already exist in the customer folder are left in `force-app` for you to compare; retrieves from unmapped orgs stay in `force-app`.
 
 **VS Code:** right-click a file/folder → **Org Guard: Deploy / Retrieve This Source**. It blocks the action if the folder does not belong to the current default org, and asks for explicit confirmation when it does. The status bar shows `customer → org`; click it to switch. Install/update with `antigravity-ide --install-extension tools/org-guard/org-guard.vsix --force` (Antigravity IDE) or `code --install-extension ...` (VS Code) — install it in whichever editor has the Salesforce extensions. The built-in **SFDX: Deploy/Retrieve This Source** menus are NOT guarded — avoid them.
 
+**Authorizing a client org without credentials** (Subscriber Access, single/one-time login URL):
+
+```bash
+node scripts/auth/connect.mjs "<login URL>"            # single login URL / frontdoor link / my-domain URL
+node scripts/auth/connect.mjs                          # Subscriber Access: log in to the partner org in the opened
+                                                       # browser, click Login on the subscriber
+node scripts/auth/connect.mjs --refresh "Acme - Production" --keepalive   # session expired: log in again, then re-capture
+```
+
+It opens a dedicated Chrome profile (`~/.sf-auth-browser`) and reads the API session cookie itself. Then it tries to upgrade to a normal OAuth login with a refresh token, which keeps working after the browser session ends. Login-as and Subscriber Access sessions can't approve OAuth. For those it saves the session instead, which lasts only as long as the browser session; `--keepalive` stops it from timing out while you work. The new alias is picked up by Org Guard like any other login. `scripts/auth/login-sid.sh` is the manual fallback: you paste the cookie yourself.
+
 **CLI:**
 
 ```powershell
-.\scripts\use-customer.ps1 rudra-motors                      # switch default org
-.\scripts\deploy.ps1   customers\rudra-motors                 # guarded deploy
-.\scripts\retrieve.ps1 customers\rudra-motors                 # guarded retrieve (existing files)
-.\scripts\retrieve-new.ps1 rudra-motors "ApexClass:RM_Foo"    # pull new components into the folder
+.\scripts\use-customer.ps1 sandbox-rudra-motors              # switch default org
+.\scripts\deploy.ps1   customers\sandbox-rudra-motors         # guarded deploy
+.\scripts\retrieve.ps1 customers\sandbox-rudra-motors         # guarded retrieve (existing files)
+.\scripts\retrieve-new.ps1 sandbox-rudra-motors "ApexClass:RM_Foo" # pull new components into the folder
 ```

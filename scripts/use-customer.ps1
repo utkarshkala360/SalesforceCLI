@@ -3,7 +3,7 @@
 # This Source) always use this default org, so run this before working on
 # a different customer.
 #
-# Usage: .\scripts\use-customer.ps1 rudra-motors
+# Usage: .\scripts\use-customer.ps1 sandbox-rudra-motors
 
 param(
     [Parameter(Mandatory = $true)][string]$Customer

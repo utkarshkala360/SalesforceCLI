@@ -49,3 +49,7 @@ $RECYCLE.BIN/
 
 # Org Guard retrieve-new temp folder
 retrieve-tmp/
+
+# Exported org auth (contains refresh tokens)
+*-auth.json
+/auth-exports/

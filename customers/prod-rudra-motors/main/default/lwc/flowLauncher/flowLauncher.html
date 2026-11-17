@@ -1,0 +1,61 @@
+<template>
+  <div class="slds-p-around_small">
+    <template lwc:if={isConnected}>
+      <p class="slds-text-color_success">
+        <lightning-icon
+          icon-name="utility:success"
+          size="x-small"
+          variant="success"
+          class="slds-m-right_x-small"
+        ></lightning-icon>
+        Listening for calls
+      </p>
+    </template>
+    <template lwc:elseif={isConnecting}>
+      <p class="slds-text-color_weak">Connecting…</p>
+    </template>
+    <template lwc:elseif={hasError}>
+      <p class="slds-text-color_error">
+        <lightning-icon
+          icon-name="utility:error"
+          size="x-small"
+          variant="error"
+          class="slds-m-right_x-small"
+        ></lightning-icon>
+        {errorMessage}
+      </p>
+      <lightning-button
+        label="Reconnect"
+        class="slds-m-top_x-small"
+        onclick={handleRetry}
+      ></lightning-button>
+    </template>
+
+    <h3 class="slds-text-title_caps slds-m-top_medium slds-m-bottom_x-small">
+      Recent calls
+    </h3>
+    <template lwc:if={hasRecent}>
+      <ul class="slds-has-dividers_bottom-space">
+        <template for:each={recent} for:item="call">
+          <li
+            key={call.key}
+            class="slds-item slds-grid slds-grid_vertical-align-center"
+          >
+            <span class="slds-col">{call.receivedAt}</span>
+            <lightning-button
+              label="Reopen"
+              data-key={call.key}
+              onclick={handleReopen}
+            ></lightning-button>
+          </li>
+        </template>
+      </ul>
+    </template>
+    <template lwc:else>
+      <p class="slds-text-color_weak">
+        No calls yet. The task form will pop up automatically when a call is
+        logged.
+      </p>
+    </template>
+  </div>
+</template>

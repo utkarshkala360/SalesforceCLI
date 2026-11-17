@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CallAnchor_Play_Recording__c</fullName>
+    <description
+  >Opens the Call Anchor recording player for this activity. Shown only when a recording URL was received.</description>
+    <externalId>false</externalId>
+    <formula>IF(
+  ISBLANK(CallAnchor_Recording_Url__c),
+  &quot;&quot;,
+  HYPERLINK(&quot;/lightning/cmp/c__callAnchorTaskPlayer?c__recordId=&quot; &amp; Id, &quot;Play Recording&quot;, &quot;_self&quot;)
+)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Play Recording</label>
+    <required>false</required>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

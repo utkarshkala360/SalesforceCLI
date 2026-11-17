@@ -3,8 +3,8 @@
 # directory (force-app), so this retrieves into a temp folder inside the
 # project (the CLI requires that) and copies the result into customers/<Customer>.
 #
-# Usage: .\scripts\retrieve-new.ps1 rudra-motors "ApexClass:RM_Foo" "LightningComponentBundle:rmBar"
-#        .\scripts\retrieve-new.ps1 rudra-motors -Manifest manifest\package.xml
+# Usage: .\scripts\retrieve-new.ps1 sandbox-rudra-motors "ApexClass:RM_Foo" "LightningComponentBundle:rmBar"
+#        .\scripts\retrieve-new.ps1 sandbox-rudra-motors -Manifest manifest\package.xml
 
 param(
     [Parameter(Mandatory = $true, Position = 0)][string]$Customer,

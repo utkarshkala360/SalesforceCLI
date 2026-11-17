@@ -6,6 +6,7 @@
 const vscode = require("vscode");
 const fs = require("fs");
 const path = require("path");
+const os = require("os");
 const { execFile } = require("child_process");
 
 let statusItem;
@@ -360,6 +361,170 @@ async function sortLanding() {
   }
 }
 
+// ---------- Auto-register: scaffold a customer folder for every newly authorized org ----------
+// The CLI stores one <username>.json per authorized org in ~/.sfdx, and aliases in
+// ~/.sfdx/alias.json. When a username appears that is not mapped yet, this creates
+// customers/<slug>/main/default, maps it in customers/customers.json and adds it to
+// sfdx-project.json. Orgs already authorized when this first runs are left alone.
+
+const SFDX_DIR = path.join(os.homedir(), ".sfdx");
+const KNOWN_ORGS_KEY = "orgGuard.knownOrgs";
+let registerTimer;
+let registerQueue = Promise.resolve();
+
+function readAuthorizedOrgs() {
+  const aliasesByUser = {};
+  const aliasStore = readJson(path.join(SFDX_DIR, "alias.json")) || {};
+  for (const [alias, username] of Object.entries(aliasStore.orgs || {})) {
+    aliasesByUser[username] ??= alias;
+  }
+  let files = [];
+  try {
+    files = fs.readdirSync(SFDX_DIR);
+  } catch {
+    return [];
+  }
+  return files
+    .filter((f) => f.endsWith(".json") && f.includes("@"))
+    .map((f) => {
+      const username = f.slice(0, -".json".length);
+      return { username, alias: aliasesByUser[username] };
+    });
+}
+
+function slugify(name) {
+  return (
+    name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "") || "org"
+  );
+}
+
+// Customer folders are named {env}-{alias}: "Runwal - Sandbox" -> sandbox-runwal,
+// "Etha Realty - Production" -> prod-etha-realty. Names without an
+// " - <env>" suffix fall back to a plain slug.
+const ENV_PREFIXES = {
+  production: "prod",
+  prod: "prod",
+  sandbox: "sandbox",
+  dev: "dev",
+  developer: "dev"
+};
+
+function folderName(name) {
+  const i = name.lastIndexOf(" - ");
+  if (i === -1) {
+    return slugify(name);
+  }
+  const alias = slugify(name.slice(0, i));
+  const env = slugify(name.slice(i + 3));
+  return `${ENV_PREFIXES[env] || env}-${alias}`;
+}
+
+function writeJson(file, data) {
+  fs.writeFileSync(file, JSON.stringify(data, null, 2) + "\n");
+}
+
+function registerOrg(root, org, map) {
+  const base = folderName(org.alias || org.username);
+  const taken = (name) =>
+    name in map || fs.existsSync(path.join(root, "customers", name));
+  let folder = base;
+  for (let i = 1; taken(folder); i++) {
+    folder = `${base}_${i}`;
+  }
+
+  const defaultDir = path.join(root, "customers", folder, "main", "default");
+  fs.mkdirSync(defaultDir, { recursive: true });
+  fs.writeFileSync(path.join(defaultDir, ".gitkeep"), "");
+
+  map[folder] = org.alias || org.username;
+  writeJson(path.join(root, "customers", "customers.json"), map);
+
+  const projectFile = path.join(root, "sfdx-project.json");
+  const project = readJson(projectFile);
+  if (!project) {
+    throw new Error("sfdx-project.json could not be read");
+  }
+  const dirPath = `customers/${folder}`;
+  project.packageDirectories ??= [];
+  if (!project.packageDirectories.some((d) => d.path === dirPath)) {
+    project.packageDirectories.push({ path: dirPath });
+    writeJson(projectFile, project);
+  }
+  return folder;
+}
+
+async function registerNewOrgs(context) {
+  const root = findProjectRoot();
+  if (!root) {
+    return;
+  }
+  const orgs = readAuthorizedOrgs();
+  const known = context.workspaceState.get(KNOWN_ORGS_KEY);
+  if (!known) {
+    // First run in this workspace: everything authorized so far is the baseline.
+    await context.workspaceState.update(
+      KNOWN_ORGS_KEY,
+      orgs.map((o) => o.username)
+    );
+    return;
+  }
+
+  const knownSet = new Set(known);
+  const fresh = orgs.filter((o) => !knownSet.has(o.username));
+  if (fresh.length === 0) {
+    return;
+  }
+
+  const map = readCustomerMap(root);
+  const aliases = await readAliases(root);
+  const mapped = new Set(Object.values(map).map((v) => toUsername(aliases, v)));
+  for (const org of fresh) {
+    // A re-auth under an alias that is already mapped needs no new folder.
+    if (!mapped.has(org.username)) {
+      const folder = registerOrg(root, org, map);
+      const label = org.alias || org.username;
+      const switchLabel = "Switch to it";
+      vscode.window
+        .showInformationMessage(
+          `Org Guard: new org "${label}" registered as customers/${folder}.`,
+          switchLabel
+        )
+        .then((choice) => {
+          if (choice === switchLabel) {
+            switchCustomer(root, folder).catch(() => undefined);
+          }
+        });
+    }
+    knownSet.add(org.username);
+    await context.workspaceState.update(KNOWN_ORGS_KEY, [...knownSet]);
+  }
+}
+
+function scheduleRegister(context) {
+  clearTimeout(registerTimer);
+  // The alias is written just after the auth file; wait for the CLI to finish.
+  registerTimer = setTimeout(() => {
+    registerQueue = registerQueue
+      .then(() => registerNewOrgs(context))
+      .catch((err) => {
+        vscode.window.showErrorMessage(
+          `Org Guard: could not register new org: ${err.message}`
+        );
+      });
+  }, 3000);
+}
+
+function watchAuthorizations(context) {
+  fs.mkdirSync(SFDX_DIR, { recursive: true });
+  const watcher = fs.watch(SFDX_DIR, () => scheduleRegister(context));
+  context.subscriptions.push({ dispose: () => watcher.close() });
+  // Pick up orgs authorized while the editor was closed.
+  scheduleRegister(context);
+}
+
 function activate(context) {
   statusItem = vscode.window.createStatusBarItem(
     vscode.StatusBarAlignment.Left,
@@ -403,6 +568,14 @@ function activate(context) {
     landingWatcher.onDidChange(scheduleSort);
     context.subscriptions.push(landingWatcher);
     scheduleSort();
+
+    if (
+      vscode.workspace
+        .getConfiguration("orgGuard")
+        .get("autoRegisterNewOrgs", true)
+    ) {
+      watchAuthorizations(context);
+    }
   }
   refreshStatus();
 }

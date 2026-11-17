@@ -2,7 +2,7 @@
 # (files are overwritten in place). For components not yet in the project, use
 # retrieve-new.ps1.
 #
-# Usage: .\scripts\retrieve.ps1 customers\rudra-motors
+# Usage: .\scripts\retrieve.ps1 customers\sandbox-rudra-motors
 
 param(
     [Parameter(Mandatory = $true, ValueFromRemainingArguments = $true)][string[]]$Paths

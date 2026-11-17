@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <columns>
+        <field>Lead$Name</field>
+    </columns>
+    <columns>
+        <field>Lead$Id</field>
+    </columns>
+    <columns>
+        <field>Lead.Activities$Call_Anchor_Call_Id__c</field>
+    </columns>
+    <columns>
+        <field>Lead.Activities$Call_Anchor_Agent_Mobile__c</field>
+    </columns>
+    <columns>
+        <field>Lead.Activities$Call_Anchor_Call_Started_At__c</field>
+    </columns>
+    <columns>
+        <field>Lead.Activities$Call_Anchor_Call_Type__c</field>
+    </columns>
+    <columns>
+        <field>Lead.Activities$Call_Anchor_Disposition__c</field>
+    </columns>
+    <columns>
+        <field>Lead.Activities$Call_Anchor_Disposition_Note__c</field>
+    </columns>
+    <description
+  >Scheduled callback activities grouped by named portal agent then callback date. All callback dates by default. Edit unlocked Agent Name filter to equals the selected agent. Blank agent names excluded.</description>
+    <filter>
+        <criteriaItems>
+            <column>Lead.Activities$Call_Anchor_Call_Id__c</column>
+            <columnToColumn>false</columnToColumn>
+            <isUnlocked>false</isUnlocked>
+            <operator>notEqual</operator>
+            <value />
+        </criteriaItems>
+        <criteriaItems>
+            <column>Lead.Activities$IsTask</column>
+            <columnToColumn>false</columnToColumn>
+            <isUnlocked>false</isUnlocked>
+            <operator>equals</operator>
+            <value>1</value>
+        </criteriaItems>
+        <criteriaItems>
+            <column
+      >Lead.Activities$Call_Anchor_Callback_Scheduled_At__c</column>
+            <columnToColumn>false</columnToColumn>
+            <isUnlocked>false</isUnlocked>
+            <operator>notEqual</operator>
+            <value />
+        </criteriaItems>
+        <criteriaItems>
+            <column>Lead.Activities$Call_Anchor_Agent_Name__c</column>
+            <columnToColumn>false</columnToColumn>
+            <isUnlocked>true</isUnlocked>
+            <operator>notEqual</operator>
+            <value />
+        </criteriaItems>
+    </filter>
+    <format>Summary</format>
+    <groupingsDown>
+        <dateGranularity>Day</dateGranularity>
+        <field>Lead.Activities$Call_Anchor_Agent_Name__c</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsDown>
+    <groupingsDown>
+        <dateGranularity>Day</dateGranularity>
+        <field>Lead.Activities$Call_Anchor_Callback_Scheduled_At__c</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsDown>
+    <name>CA - Follow-ups by Agent and Date</name>
+    <params>
+        <name>co</name>
+        <value>1</value>
+    </params>
+    <reportType>Activities_with_Leads_Call_Anchor__c</reportType>
+    <scope>organization</scope>
+    <showDetails>true</showDetails>
+    <showGrandTotal>true</showGrandTotal>
+    <showSubTotals>true</showSubTotals>
+    <timeFrameFilter>
+        <dateColumn
+    >Lead.Activities$Call_Anchor_Callback_Scheduled_At__c</dateColumn>
+        <interval>INTERVAL_CUSTOM</interval>
+    </timeFrameFilter>
+</Report>

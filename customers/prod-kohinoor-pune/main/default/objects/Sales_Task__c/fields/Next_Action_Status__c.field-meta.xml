@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Next_Action_Status__c</fullName>
+    <label>Next Action Status</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>No action needed</fullName>
+                <default>false</default>
+                <label>No action needed</label>
+            </value>
+            <value>
+                <fullName>Virtual Meeting</fullName>
+                <default>false</default>
+                <label>Virtual Meeting</label>
+            </value>
+            <value>
+                <fullName>Follow Up</fullName>
+                <default>false</default>
+                <label>Follow Up</label>
+            </value>
+            <value>
+                <fullName>Outbound Call</fullName>
+                <default>false</default>
+                <label>Outbound Call</label>
+            </value>
+            <value>
+                <fullName>Inbound Call</fullName>
+                <default>false</default>
+                <label>Inbound Call</label>
+            </value>
+            <value>
+                <fullName>Documentation</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Documentation</label>
+            </value>
+            <value>
+                <fullName>Inbound Call NO</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Inbound Call NO</label>
+            </value>
+            <value>
+                <fullName>Outbound Call NO</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Outbound Call NO</label>
+            </value>
+            <value>
+                <fullName>Outbound Meeting</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Outbound Meeting</label>
+            </value>
+            <value>
+                <fullName>Payment</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Payment</label>
+            </value>
+            <value>
+                <fullName>Registration</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Registration</label>
+            </value>
+            <value>
+                <fullName>Revisit</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Revisit</label>
+            </value>
+            <value>
+                <fullName
+        >Send Brochure/ Project Details/ Cost sheet/ Others</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label
+        >Send Brochure/ Project Details/ Cost sheet/ Others</label>
+            </value>
+            <value>
+                <fullName>Site visit proposed</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Site visit proposed</label>
+            </value>
+            <value>
+                <fullName>Stamp duty</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Stamp duty</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

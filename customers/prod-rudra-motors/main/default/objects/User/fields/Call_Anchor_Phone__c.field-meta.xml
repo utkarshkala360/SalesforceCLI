@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Call_Anchor_Phone__c</fullName>
+    <description
+  >Set by admins. The phone number this user calls from in the Call Anchor app. The Call Anchor webhook matches the call&apos;s agentNumber (last 10 digits) against this field to set the owner of the call log Task and the callback follow-up Task.</description>
+    <externalId>false</externalId>
+    <inlineHelpText
+  >The agent&apos;s mobile number as registered in the Call Anchor app. Calls from this number are logged as Tasks owned by this user.</inlineHelpText>
+    <label>Call Anchor Phone</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>Phone</type>
+</CustomField>

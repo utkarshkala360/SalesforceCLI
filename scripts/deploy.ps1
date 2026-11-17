@@ -1,7 +1,7 @@
 # Guarded deploy of one or more paths inside a single customer folder.
 #
-# Usage: .\scripts\deploy.ps1 customers\rudra-motors
-#        .\scripts\deploy.ps1 customers\rudra-motors\main\default\classes\RM_Foo.cls
+# Usage: .\scripts\deploy.ps1 customers\sandbox-rudra-motors
+#        .\scripts\deploy.ps1 customers\sandbox-rudra-motors\main\default\classes\RM_Foo.cls
 
 param(
     [Parameter(Mandatory = $true, ValueFromRemainingArguments = $true)][string[]]$Paths

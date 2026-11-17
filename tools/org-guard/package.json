@@ -2,7 +2,7 @@
   "name": "org-guard",
   "displayName": "Org Guard",
   "description": "Deploy/retrieve customer folders only to the org mapped in customers/customers.json, with an explicit confirmation every time.",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "publisher": "local-360",
   "license": "UNLICENSED",
   "repository": {
@@ -41,6 +41,11 @@
           "type": "boolean",
           "default": true,
           "description": "Move components retrieved into force-app (e.g. via Org Browser) into customers/<customer>/ for the current default org."
+        },
+        "orgGuard.autoRegisterNewOrgs": {
+          "type": "boolean",
+          "default": true,
+          "description": "When a new org is authorized (sf org login / SFDX: Authorize an Org), create customers/<alias>/main/default and add it to customers/customers.json and sfdx-project.json."
         }
       }
     },

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description
+  >Lets admins view and edit the Call Anchor Phone field on User, which maps Call Anchor agents to Salesforce users.</description>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>User.Call_Anchor_Phone__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>Call Anchor Phone Access</label>
+</PermissionSet>

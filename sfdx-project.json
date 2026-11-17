@@ -5,25 +5,79 @@
       "default": true
     },
     {
-      "path": "customers/utkarsh-dev-sf"
+      "path": "customers/--dev-utkarsh--"
     },
     {
-      "path": "customers/etha-realty"
+      "path": "customers/--prod-hr-org--"
     },
     {
-      "path": "customers/elephantine"
+      "path": "customers/--sandbox-hr-org--"
     },
     {
-      "path": "customers/manish-minerals"
+      "path": "customers/dev-giftedson"
     },
     {
-      "path": "customers/rudra-motors"
+      "path": "customers/sandbox-elegant-altima"
     },
     {
-      "path": "customers/wunderbar"
+      "path": "customers/sandbox-manish-minerals"
     },
     {
-      "path": "customers/runwal-sandbox"
+      "path": "customers/sandbox-rudra-motors"
+    },
+    {
+      "path": "customers/sandbox-runwal"
+    },
+    {
+      "path": "customers/sandbox-wunderbar"
+    },
+    {
+      "path": "customers/prod-elephantine"
+    },
+    {
+      "path": "customers/prod-etha-realty"
+    },
+    {
+      "path": "customers/prod-rudra-motors"
+    },
+    {
+      "path": "customers/prod-ruparel"
+    },
+    {
+      "path": "customers/prod-wunderbar"
+    },
+    {
+      "path": "customers/prod-kohinoor-pune"
+    },
+    {
+      "path": "customers/prod-elegant-altima"
+    },
+    {
+      "path": "customers/prod-zuari"
+    },
+    {
+      "path": "customers/dev-rishik-mishra"
+    },
+    {
+      "path": "customers/prod-vtp"
+    },
+    {
+      "path": "customers/dev-shalu"
+    },
+    {
+      "path": "customers/sandbox-govche"
+    },
+    {
+      "path": "customers/prod-manish-minerals"
+    },
+    {
+      "path": "customers/callanchor-dev"
+    },
+    {
+      "path": "customers/callanchor-devhub"
+    },
+    {
+      "path": "customers/callanchor-ns"
     }
   ],
   "name": "DevBox",

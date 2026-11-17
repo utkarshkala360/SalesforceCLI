@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <columns>
+        <field>WHO_NAME</field>
+    </columns>
+    <columns>
+        <field>WHAT_NAME</field>
+    </columns>
+    <columns>
+        <aggregateTypes>Unique</aggregateTypes>
+        <field>Activity.Call_Anchor_Call_Id__c</field>
+    </columns>
+    <columns>
+        <field>Activity.Call_Anchor_Agent_Name__c</field>
+    </columns>
+    <columns>
+        <field>ASSIGNED</field>
+    </columns>
+    <columns>
+        <field>Activity.Task_Time__c</field>
+    </columns>
+    <columns>
+        <field>Activity.Call_Anchor_Call_Type__c</field>
+    </columns>
+    <columns>
+        <field>CALLDISPOSITION</field>
+    </columns>
+    <customDetailFormulas>
+        <calculatedFormula
+    >IF(NOT(ISBLANK(LEAD)), &quot;Lead&quot;, IF(NOT(ISBLANK(OPPORTUNITY)), &quot;Opportunity&quot;, &quot;Not linked&quot;))</calculatedFormula>
+        <dataType>Text</dataType>
+        <description
+    >Lead when the Task is on a Lead, Opportunity when on an Opportunity, otherwise Not linked.</description>
+        <developerName>CDF1</developerName>
+        <label>Linked To</label>
+        <scale>0</scale>
+    </customDetailFormulas>
+    <description
+  >Call Anchor calls split by the record the call Task is on: Lead, Opportunity, or Not linked (no matching record found). Unique Count of Call ID counts calls. Call Tasks only. All dates; the dashboard Date filter (Start Time) sets the period.</description>
+    <filter>
+        <criteriaItems>
+            <column>Activity.Call_Anchor_Call_Id__c</column>
+            <columnToColumn>false</columnToColumn>
+            <isUnlocked>false</isUnlocked>
+            <operator>notEqual</operator>
+            <value />
+        </criteriaItems>
+        <criteriaItems>
+            <column>TASK_SUBTYPE</column>
+            <columnToColumn>false</columnToColumn>
+            <isUnlocked>false</isUnlocked>
+            <operator>equals</operator>
+            <value>Call</value>
+        </criteriaItems>
+    </filter>
+    <format>Summary</format>
+    <groupingsDown>
+        <dateGranularity>Day</dateGranularity>
+        <field>CDF1</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsDown>
+    <name>CA - Calls by Linked Record</name>
+    <params>
+        <name>closed</name>
+        <value>all</value>
+    </params>
+    <params>
+        <name>type</name>
+        <value>t</value>
+    </params>
+    <params>
+        <name>co</name>
+        <value>1</value>
+    </params>
+    <reportType>Activity</reportType>
+    <scope>organization</scope>
+    <showDetails>true</showDetails>
+    <showGrandTotal>true</showGrandTotal>
+    <showSubTotals>true</showSubTotals>
+    <timeFrameFilter>
+        <dateColumn>Activity.Task_Time__c</dateColumn>
+        <interval>INTERVAL_CUSTOM</interval>
+    </timeFrameFilter>
+</Report>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Call_Anchor_Call_Type__c</fullName>
+    <description
+  >Call type as sent by the Call Anchor app. The standard Call Type field only allows Inbound/Outbound/Internal, so Missed and Rejected are kept here.</description>
+    <label>Call Anchor Call Type</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>false</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value><fullName>Incoming</fullName><default>false</default><label
+        >Incoming</label></value>
+            <value><fullName>Outgoing</fullName><default>false</default><label
+        >Outgoing</label></value>
+            <value><fullName>Missed</fullName><default>false</default><label
+        >Missed</label></value>
+            <value><fullName>Rejected</fullName><default>false</default><label
+        >Rejected</label></value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>
